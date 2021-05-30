@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - app-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test_docker
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    networks:
+      - app-network
+
+  app:
+    build: .
+    restart: always
+    privileged: true
+    environment:
+      DB_HOST: db
+      DB_NAME: test_docker
+      DB_USERNAME: test
+      DB_PASSWORD: test
+      BASE_URL: http://localhost:80/
+    depends_on:
+      - db
+    networks:
+      - app-network
+    ports:
+      - "80:80"
+
+networks:
+  app-network:
+
+volumes:
+  app-volume:
